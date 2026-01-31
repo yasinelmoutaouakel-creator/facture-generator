@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Factures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen p-6">
+    
+    <!-- Contrôles en haut -->
+    <div class="max-w-5xl mx-auto mb-6 no-print">
+        <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex gap-3">
+                    <button id="btnFacture" onclick="setDocType('Facture')" class="px-6 py-2 text-sm font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm">
+                        Facture
+                    </button>
+                    <button id="btnDevis" onclick="setDocType('Devis')" class="px-6 py-2 text-sm font-bold rounded-lg transition text-slate-500">
+                        Devis
+                    </button>
+                </div>
+                
+                <div class="flex gap-3 items-center">
+                    <select onchange="updateCurrency(this.value)" class="px-4 py-2 border border-slate-200 rounded-lg font-semibold text-sm">
+                        <option value="MAD">MAD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="USD">USD</option>
+                    </select>
+                    
+                    <input type="number" value="20" onchange="updateTva(this.value)" 
+                           class="w-24 px-4 py-2 border border-slate-200 rounded-lg font-semibold text-sm" 
+                           placeholder="TVA %">
+                    
+                    <button onclick="newInvoice()" class="px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                        <i data-lucide="file-plus" class="w-4 h-4"></i>
+                        Nouvelle facture
+                    </button>
+                    
+                    <button onclick="downloadPDF()" class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition flex items-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Télécharger PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document principal -->
+    <div id="invoice-document" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl p-8 print-reset">
+        
+        <!-- En-tête -->
+        <div class="flex justify-between items-start mb-6 pb-4 border-b-2 border-indigo-100">
+            <div class="flex-1">
+                <div class="relative w-32 h-32 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center overflow-hidden group cursor-pointer">
+                    <input type="file" id="logo-input" accept="image/*" onchange="handleLogo(this)" class="hidden">
+                    <label for="logo-input" class="cursor-pointer w-full h-full flex items-center justify-center">
+                        <div id="logo-placeholder" class="text-center">
+                            <i data-lucide="image-plus" class="w-12 h-12 mx-auto text-slate-300 mb-2"></i>
+                            <p class="text-xs text-slate-400 font-semibold">Ajouter logo</p>
+                        </div>
+                        <img id="logo-preview" class="hidden w-full h-full object-contain" alt="Logo">
+                    </label>
+                </div>
+            </div>
+            
+            <div class="text-right">
+                <h1 id="doc-title-display" class="text-4xl font-black text-indigo-600 mb-3">Facture</h1>
+                <div class="space-y-1">
+                    <div class="flex items-center justify-end gap-3">
+                        <span class="text-sm font-semibold text-slate-500">N°:</span>
+                        <input type="text" id="doc-ref" placeholder="2025-001" class="text-right text-lg font-bold text-slate-700 border-b-2 border-slate-200 focus:border-indigo-400 outline-none px-2 py-1 w-40">
+                    </div>
+                    <div class="flex items-center justify-end gap-3">
+                        <span class="text-sm font-semibold text-slate-500">Date:</span>
+                        <input type="date" id="doc-date" class="text-right text-lg font-bold text-slate-700 border-b-2 border-slate-200 focus:border-indigo-400 outline-none px-2 py-1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infos Entreprise et Client -->
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <div>
+                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">De</h3>
+                <div class="bg-slate-50 rounded-xl p-3 space-y-1">
+                    <input type="text" placeholder="Nom de votre entreprise" class="w-full font-bold text-lg mb-1 bg-transparent">
+                    <textarea placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">À</h3>
+                <div class="bg-indigo-50 rounded-xl p-3 space-y-1">
+                    <input type="text" placeholder="Nom du client" class="w-full font-bold text-lg mb-1 bg-transparent">
+                    <textarea placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau des articles -->
+        <div class="mb-6">
+            <div class="max-h-96 overflow-y-auto border border-slate-200 rounded-lg">
+                <table class="w-full">
+                    <thead class="sticky top-0 bg-white z-10">
+                        <tr class="border-b-2 border-indigo-600">
+                            <th class="text-left py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider">Description</th>
+                            <th class="text-center py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-24">Qté</th>
+                            <th class="text-right py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-32">Prix Unit.</th>
+                            <th class="text-right py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-32">Total</th>
+                            <th class="w-12 no-print"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="items-body"></tbody>
+                </table>
+            </div>
+            
+            <button onclick="addItem()" class="mt-4 px-4 py-2 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 rounded-lg transition flex items-center gap-2 no-print">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                Ajouter une ligne
+            </button>
+        </div>
+
+        <!-- Totaux -->
+        <div class="flex justify-end">
+            <div class="w-80 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 space-y-2">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-semibold text-slate-600">Sous-total HT</span>
+                    <span id="subtotal" class="font-bold text-slate-700">0.00 MAD</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span id="tva-label" class="font-semibold text-slate-600">TVA (20%)</span>
+                    <span id="tva-val" class="font-bold text-slate-700">0.00 MAD</span>
+                </div>
+                <div class="border-t-2 border-indigo-200 pt-3 flex justify-between items-center">
+                    <span class="font-black text-lg text-indigo-600">TOTAL TTC</span>
+                    <span id="total-ttc" class="font-black text-2xl text-indigo-600">0.00 MAD</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="mt-6 pt-4 border-t border-slate-200">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Notes / Conditions</h3>
+            <textarea placeholder="Merci pour votre confiance..." rows="2" class="w-full text-sm text-slate-600 border border-slate-200 rounded-lg p-2 resize-none"></textarea>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="mt-4 text-center text-xs text-slate-400">
+            <p class="font-semibold">Merci pour votre confiance !</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

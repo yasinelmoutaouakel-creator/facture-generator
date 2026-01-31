@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+input, textarea {
+    background: transparent;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #cbd5e1;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+}
+
+/* Amélioration de l'apparence des inputs pour le PDF */
+input[type="text"], 
+input[type="date"], 
+input[type="number"], 
+textarea {
+    transition: all 0.2s ease;
+}
+
+/* Style spécial pour les inputs de date et référence */
+#doc-ref, #doc-date {
+    font-weight: 700;
+    color: #334155;
+}
+
+/* Style pour garantir une seule page PDF */
+#invoice-document {
+    max-height: fit-content;
+}
+
+@media print {
+    .no-print, 
+    .no-print * { 
+        display: none !important; 
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    body { 
+        background: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .print-reset { 
+        box-shadow: none !important; 
+        border-radius: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 15mm !important;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+    
+    /* S'assurer que les couleurs d'arrière-plan s'impriment parfaitement */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    /* Améliorer la qualité des backgrounds colorés */
+    .bg-slate-50,
+    .bg-indigo-50,
+    .bg-gradient-to-br {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Forcer l'affichage des valeurs des inputs */
+    input, textarea {
+        border: none !important;
+        background: transparent !important;
+        color: #1e293b !important;
+        font-weight: inherit !important;
+    }
+    
+    input[type="date"], input[type="text"], input[type="number"] {
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    
+    /* Empêcher les sauts de page */
+    tr, td, th, div, section {
+        page-break-inside: avoid !important;
+    }
+    
+    table {
+        page-break-inside: auto;
+    }
+    
+    /* Optimiser les tailles de police pour l'impression */
+    h1 {
+        font-size: 2.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Cacher le scroll et les bordures en print */
+    .overflow-y-auto {
+        overflow: visible !important;
+        max-height: none !important;
+        border: none !important;
+    }
+    
+    thead.sticky {
+        position: static !important;
+        box-shadow: none !important;
+    }
+    
+    .space-y-2 > * + * {
+        margin-top: 0.25rem !important;
+    }
+    
+    .mb-10 {
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .mb-8 {
+        margin-bottom: 1rem !important;
+    }
+    
+    .pb-8 {
+        padding-bottom: 1rem !important;
+    }
+    
+    .p-6 {
+        padding: 1rem !important;
+    }
+    
+    .py-4 {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+    
+    /* Assurer que les bordures sont visibles */
+    .border-b-2,
+    .border-indigo-600,
+    .border-slate-100 {
+        border-color: inherit !important;
+    }
+}
+
+/* Animation pour les boutons */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Style pour les lignes du tableau */
+#items-body tr {
+    transition: background-color 0.2s ease;
+}
+
+#items-body tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Scrollbar personnalisée pour le tableau */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* En-tête sticky pour le tableau */
+thead.sticky {
+    position: sticky;
+    top: 0;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
