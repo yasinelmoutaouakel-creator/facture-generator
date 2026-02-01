@@ -13,7 +13,22 @@
     
     <!-- Contrôles en haut -->
     <div class="max-w-5xl mx-auto mb-6 no-print">
-        <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100">
+        <!-- Onglets principaux -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 mb-4">
+            <div class="flex items-center gap-2 p-2">
+                <button onclick="switchTab('facture')" id="tab-facture" class="flex-1 px-6 py-3 text-sm font-bold rounded-lg transition bg-indigo-600 text-white shadow-sm">
+                    <i data-lucide="file-text" class="w-4 h-4 inline mr-2"></i>
+                    Facture / Devis
+                </button>
+                <button onclick="switchTab('clients')" id="tab-clients" class="flex-1 px-6 py-3 text-sm font-bold rounded-lg transition text-slate-500 hover:bg-slate-50">
+                    <i data-lucide="users" class="w-4 h-4 inline mr-2"></i>
+                    Clients
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contrôles de la facture -->
+        <div id="facture-controls" class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div class="flex gap-3">
                     <button id="btnFacture" onclick="setDocType('Facture')" class="px-6 py-2 text-sm font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm">
@@ -50,7 +65,8 @@
     </div>
 
     <!-- Document principal -->
-    <div id="invoice-document" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl p-8 print-reset">
+    <div id="facture-section" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl p-8 print-reset">
+        <div id="invoice-document">
         
         <!-- En-tête -->
         <div class="flex justify-between items-start mb-6 pb-4 border-b-2 border-indigo-100">
@@ -69,7 +85,7 @@
             
             <div class="text-right">
                 <h1 id="doc-title-display" class="text-4xl font-black text-indigo-600 mb-3">Facture</h1>
-                <div class="space-y-1">
+                <div class="space-y-2">
                     <div class="flex items-center justify-end gap-3">
                         <span class="text-sm font-semibold text-slate-500">N°:</span>
                         <input type="text" id="doc-ref" placeholder="2025-001" class="text-right text-lg font-bold text-slate-700 border-b-2 border-slate-200 focus:border-indigo-400 outline-none px-2 py-1 w-40">
@@ -87,36 +103,45 @@
             <div>
                 <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">De</h3>
                 <div class="bg-slate-50 rounded-xl p-3 space-y-1">
-                    <input type="text" placeholder="Nom de votre entreprise" class="w-full font-bold text-lg mb-1 bg-transparent">
-                    <textarea placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
+                    <input type="text" id="company-name" placeholder="Nom de votre entreprise" class="w-full font-bold text-lg mb-1 bg-transparent">
+                    <textarea id="company-address" placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
                 </div>
             </div>
             
             <div>
-                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">À</h3>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider">À</h3>
+                    <div class="flex gap-2 no-print">
+                        <select id="client-selector" onchange="loadClient(this.value)" class="text-xs px-3 py-1 border border-indigo-200 rounded-lg font-semibold text-indigo-600">
+                            <option value="">-- Choisir un client --</option>
+                        </select>
+                        <button onclick="saveClient()" class="text-xs px-3 py-1 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition flex items-center gap-1">
+                            <i data-lucide="save" class="w-3 h-3"></i>
+                            Sauvegarder
+                        </button>
+                    </div>
+                </div>
                 <div class="bg-indigo-50 rounded-xl p-3 space-y-1">
-                    <input type="text" placeholder="Nom du client" class="w-full font-bold text-lg mb-1 bg-transparent">
-                    <textarea placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
+                    <input type="text" id="client-name" placeholder="Nom du client" class="w-full font-bold text-lg mb-1 bg-transparent">
+                    <textarea id="client-address" placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone&#10;Email" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
                 </div>
             </div>
         </div>
 
         <!-- Tableau des articles -->
         <div class="mb-6">
-            <div class="max-h-96 overflow-y-auto border border-slate-200 rounded-lg">
-                <table class="w-full">
-                    <thead class="sticky top-0 bg-white z-10">
-                        <tr class="border-b-2 border-indigo-600">
-                            <th class="text-left py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider">Description</th>
-                            <th class="text-center py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-24">Qté</th>
-                            <th class="text-right py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-32">Prix Unit.</th>
-                            <th class="text-right py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-32">Total</th>
-                            <th class="w-12 no-print"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="items-body"></tbody>
-                </table>
-            </div>
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b-2 border-indigo-600">
+                        <th class="text-left py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider">Description</th>
+                        <th class="text-center py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-24">Qté</th>
+                        <th class="text-right py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-32">Prix Unit.</th>
+                        <th class="text-right py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider w-32">Total</th>
+                        <th class="w-12 no-print"></th>
+                    </tr>
+                </thead>
+                <tbody id="items-body"></tbody>
+            </table>
             
             <button onclick="addItem()" class="mt-4 px-4 py-2 text-indigo-600 font-semibold text-sm hover:bg-indigo-50 rounded-lg transition flex items-center gap-2 no-print">
                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -151,6 +176,175 @@
         <!-- Pied de page -->
         <div class="mt-4 text-center text-xs text-slate-400">
             <p class="font-semibold">Merci pour votre confiance !</p>
+        </div>
+        </div> <!-- Fin invoice-document -->
+    </div> <!-- Fin facture-section -->
+
+    <!-- Section Clients -->
+    <div id="clients-section" class="max-w-6xl mx-auto hidden">
+        <!-- Sous-menu Clients -->
+        <div class="bg-white rounded-2xl shadow-lg p-4 mb-6 border border-slate-100">
+            <div class="flex gap-3">
+                <button onclick="switchClientTab('all')" id="client-tab-all" class="px-6 py-2 text-sm font-bold rounded-lg transition bg-indigo-600 text-white">
+                    Tous les clients
+                </button>
+                <button onclick="switchClientTab('history-factures')" id="client-tab-history-factures" class="px-6 py-2 text-sm font-bold rounded-lg transition text-slate-500 hover:bg-slate-50">
+                    Historique Factures
+                </button>
+                <button onclick="switchClientTab('history-devis')" id="client-tab-history-devis" class="px-6 py-2 text-sm font-bold rounded-lg transition text-slate-500 hover:bg-slate-50">
+                    Historique Devis
+                </button>
+            </div>
+        </div>
+
+        <!-- Tous les clients -->
+        <div id="clients-all" class="bg-white rounded-2xl shadow-2xl p-8">
+            <div class="mb-6">
+                <h2 class="text-3xl font-black text-indigo-600 mb-6">Gestion des Clients</h2>
+                
+                <!-- Barre de recherche et filtres -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <input type="text" id="search-client" onkeyup="filterClients()" placeholder="🔍 Rechercher un client..." class="col-span-2 px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                    
+                    <select id="filter-city" onchange="filterClients()" class="px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                        <option value="">📍 Toutes les villes</option>
+                    </select>
+                    
+                    <select id="filter-country" onchange="filterClients()" class="px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                        <option value="">🌍 Tous les pays</option>
+                    </select>
+                </div>
+
+                <button onclick="openAddClientModal()" class="px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center gap-2 mb-6">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    Ajouter un nouveau client
+                </button>
+            </div>
+
+            <!-- Tableau des clients -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-indigo-600">
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Nom</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Ville</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Pays</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Téléphone</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Email</th>
+                            <th class="text-center py-3 px-4 text-sm font-black text-indigo-600 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clients-table-body">
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-slate-400">Aucun client enregistré</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Historique Factures -->
+        <div id="clients-history-factures" class="bg-white rounded-2xl shadow-2xl p-8 hidden">
+            <h2 class="text-3xl font-black text-indigo-600 mb-6">Historique des Factures</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-indigo-600">
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">N°</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Date</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Client</th>
+                            <th class="text-right py-3 px-4 text-sm font-black text-indigo-600 uppercase">Montant</th>
+                            <th class="text-center py-3 px-4 text-sm font-black text-indigo-600 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-factures-body">
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-slate-400">Aucune facture enregistrée</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Historique Devis -->
+        <div id="clients-history-devis" class="bg-white rounded-2xl shadow-2xl p-8 hidden">
+            <h2 class="text-3xl font-black text-indigo-600 mb-6">Historique des Devis</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-indigo-600">
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">N°</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Date</th>
+                            <th class="text-left py-3 px-4 text-sm font-black text-indigo-600 uppercase">Client</th>
+                            <th class="text-right py-3 px-4 text-sm font-black text-indigo-600 uppercase">Montant</th>
+                            <th class="text-center py-3 px-4 text-sm font-black text-indigo-600 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-devis-body">
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-slate-400">Aucun devis enregistré</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter/Modifier Client -->
+    <div id="client-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-black text-indigo-600 mb-6" id="modal-title">Ajouter un client</h3>
+            
+            <form id="client-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Nom du client *</label>
+                        <input type="text" id="modal-client-name" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                        <input type="email" id="modal-client-email" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Téléphone</label>
+                        <input type="tel" id="modal-client-phone" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Ville *</label>
+                        <input type="text" id="modal-client-city" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Pays *</label>
+                        <input type="text" id="modal-client-country" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Code postal</label>
+                        <input type="text" id="modal-client-zip" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Adresse</label>
+                    <textarea id="modal-client-address" rows="2" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition">
+                        Sauvegarder
+                    </button>
+                    <button type="button" onclick="closeClientModal()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition">
+                        Annuler
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

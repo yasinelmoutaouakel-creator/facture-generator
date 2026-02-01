@@ -110,16 +110,23 @@ textarea {
         margin-bottom: 1rem !important;
     }
     
-    /* Cacher le scroll et les bordures en print */
-    .overflow-y-auto {
-        overflow: visible !important;
-        max-height: none !important;
-        border: none !important;
+    /* Permettre les sauts de page pour les longs tableaux */
+    table {
+        page-break-inside: auto !important;
     }
     
-    thead.sticky {
-        position: static !important;
-        box-shadow: none !important;
+    tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+    }
+    
+    thead {
+        display: table-header-group !important;
+    }
+    
+    /* Garder les sections importantes ensemble */
+    .no-page-break {
+        page-break-inside: avoid !important;
     }
     
     .space-y-2 > * + * {
@@ -171,31 +178,4 @@ button:active {
 
 #items-body tr:hover {
     background-color: #f8fafc;
-}
-
-/* Scrollbar personnalisée pour le tableau */
-.overflow-y-auto::-webkit-scrollbar {
-    width: 8px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* En-tête sticky pour le tableau */
-thead.sticky {
-    position: sticky;
-    top: 0;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
