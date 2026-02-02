@@ -232,17 +232,18 @@ function createInvoiceForClient(index) {
     // Passer à l'onglet facture
     switchTab('facture');
     
-    // Remplir les infos client
-    document.getElementById('client-name').value = client.name;
-    const addressParts = [];
-    if (client.address) addressParts.push(client.address);
-    if (client.city && client.zip) addressParts.push(`${client.city}, ${client.zip}`);
-    else if (client.city) addressParts.push(client.city);
-    if (client.country) addressParts.push(client.country);
-    if (client.phone) addressParts.push(client.phone);
-    if (client.email) addressParts.push(client.email);
+    // Remplir les infos client dans les nouveaux champs séparés
+    document.getElementById('client-name').value = client.name || '';
+    document.getElementById('client-address').value = client.address || '';
     
-    document.getElementById('client-address').value = addressParts.join('\n');
+    // Construire ville + pays
+    const cityCountryParts = [];
+    if (client.city) cityCountryParts.push(client.city);
+    if (client.country) cityCountryParts.push(client.country);
+    document.getElementById('client-city-country').value = cityCountryParts.join(', ');
+    
+    document.getElementById('client-phone').value = client.phone || '';
+    document.getElementById('client-other').value = client.email || '';
 }
 
 // Gérer la soumission du formulaire client
@@ -355,6 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function saveClient() {
     const clientName = document.getElementById('client-name').value.trim();
     const clientAddress = document.getElementById('client-address').value.trim();
+    const clientCityCountry = document.getElementById('client-city-country').value.trim();
+    const clientPhone = document.getElementById('client-phone').value.trim();
+    const clientOther = document.getElementById('client-other').value.trim();
     
     if (!clientName) {
         alert('Veuillez entrer le nom du client avant de sauvegarder !');
@@ -370,6 +374,9 @@ function saveClient() {
     const client = {
         name: clientName,
         address: clientAddress,
+        cityCountry: clientCityCountry,
+        phone: clientPhone,
+        other: clientOther,
         date: new Date().toISOString()
     };
     
@@ -412,6 +419,9 @@ function loadClient(index) {
         // Vider les champs si on sélectionne "-- Choisir un client --"
         document.getElementById('client-name').value = '';
         document.getElementById('client-address').value = '';
+        document.getElementById('client-city-country').value = '';
+        document.getElementById('client-phone').value = '';
+        document.getElementById('client-other').value = '';
         return;
     }
     
@@ -419,31 +429,39 @@ function loadClient(index) {
     const client = clients[index];
     
     if (client) {
-        document.getElementById('client-name').value = client.name;
-        document.getElementById('client-address').value = client.address;
+        document.getElementById('client-name').value = client.name || '';
+        document.getElementById('client-address').value = client.address || '';
+        document.getElementById('client-city-country').value = client.cityCountry || '';
+        document.getElementById('client-phone').value = client.phone || '';
+        document.getElementById('client-other').value = client.other || '';
     }
 }
 
 // ===== GESTION DES INFOS ENTREPRISE =====
 
 function saveCompanyInfo() {
-    const companyName = document.getElementById('company-name').value;
-    const companyAddress = document.getElementById('company-address').value;
+    const companyName = document.getElementById('company-name')?.value;
+    const companyAddress = document.getElementById('company-address')?.value;
     
-    localStorage.setItem('companyInfo', JSON.stringify({
-        name: companyName,
-        address: companyAddress
-    }));
+    if (companyName && companyAddress) {
+        localStorage.setItem('companyInfo', JSON.stringify({
+            name: companyName,
+            address: companyAddress
+        }));
+    }
 }
 
 function loadCompanyInfo() {
     const companyInfo = JSON.parse(localStorage.getItem('companyInfo') || '{}');
     
-    if (companyInfo.name) {
-        document.getElementById('company-name').value = companyInfo.name;
+    const companyName = document.getElementById('company-name');
+    const companyAddress = document.getElementById('company-address');
+    
+    if (companyInfo.name && companyName) {
+        companyName.value = companyInfo.name;
     }
-    if (companyInfo.address) {
-        document.getElementById('company-address').value = companyInfo.address;
+    if (companyInfo.address && companyAddress) {
+        companyAddress.value = companyInfo.address;
     }
 }
 
@@ -481,9 +499,13 @@ function handleLogo(input) {
     if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            document.getElementById('logo-preview').src = e.target.result;
-            document.getElementById('logo-preview').classList.remove('hidden');
-            document.getElementById('logo-placeholder').classList.add('hidden');
+            const logoPreview = document.getElementById('logo-preview');
+            const logoPlaceholder = document.getElementById('logo-placeholder');
+            if (logoPreview && logoPlaceholder) {
+                logoPreview.src = e.target.result;
+                logoPreview.classList.remove('hidden');
+                logoPlaceholder.classList.add('hidden');
+            }
         };
         reader.readAsDataURL(file);
     }
@@ -511,59 +533,72 @@ function addItem() {
 function calculate() {
     let sub = 0;
     document.querySelectorAll('#items-body tr').forEach(row => {
-        const q = parseFloat(row.querySelector('.qty').value) || 0;
-        const p = parseFloat(row.querySelector('.price').value) || 0;
+        const q = parseFloat(row.querySelector('.qty')?.value) || 0;
+        const p = parseFloat(row.querySelector('.price')?.value) || 0;
         const total = q * p;
         sub += total;
-        row.querySelector('.line-total').innerText = total.toFixed(2);
+        const lineTotal = row.querySelector('.line-total');
+        if (lineTotal) {
+            lineTotal.innerText = total.toFixed(2);
+        }
     });
     const tva = (sub * tvaRate) / 100;
-    document.getElementById('subtotal').innerText = sub.toFixed(2) + ' ' + currency;
-    document.getElementById('tva-val').innerText = tva.toFixed(2) + ' ' + currency;
-    document.getElementById('total-ttc').innerText = (sub + tva).toFixed(2) + ' ' + currency;
+    
+    const subtotalEl = document.getElementById('subtotal');
+    const tvaValEl = document.getElementById('tva-val');
+    const totalTtcEl = document.getElementById('total-ttc');
+    
+    if (subtotalEl) subtotalEl.innerText = sub.toFixed(2) + ' ' + currency;
+    if (tvaValEl) tvaValEl.innerText = tva.toFixed(2) + ' ' + currency;
+    if (totalTtcEl) totalTtcEl.innerText = (sub + tva).toFixed(2) + ' ' + currency;
 }
 
 function newInvoice() {
     // Confirmer avant de vider
     if (confirm('Voulez-vous créer une nouvelle facture ? Toutes les données actuelles seront perdues.')) {
-        // Sauvegarder les infos entreprise avant de vider
-        const companyName = document.getElementById('company-name').value;
-        const companyAddress = document.getElementById('company-address').value;
-        
         // Vider tous les inputs du formulaire
         document.querySelectorAll('input[type="text"], textarea').forEach(input => {
             input.value = '';
         });
         
-        // Restaurer les infos entreprise
-        document.getElementById('company-name').value = companyName;
-        document.getElementById('company-address').value = companyAddress;
-        
         // Réinitialiser le sélecteur de client
-        document.getElementById('client-selector').value = '';
+        const clientSelector = document.getElementById('client-selector');
+        if (clientSelector) clientSelector.value = '';
         
         // Réinitialiser la date à aujourd'hui
-        document.getElementById('doc-date').value = new Date().toISOString().split('T')[0];
+        const docDate = document.getElementById('doc-date');
+        if (docDate) docDate.value = new Date().toISOString().split('T')[0];
         
         // Générer un nouveau numéro de facture
-        document.getElementById('doc-ref').value = generateInvoiceNumber();
+        const docRef = document.getElementById('doc-ref');
+        if (docRef) docRef.value = generateInvoiceNumber();
         
         // Supprimer toutes les lignes d'articles
-        document.getElementById('items-body').innerHTML = '';
+        const itemsBody = document.getElementById('items-body');
+        if (itemsBody) itemsBody.innerHTML = '';
         
         // Ajouter une ligne vide
         addItem();
         
-        // Réinitialiser le logo
-        document.getElementById('logo-preview').classList.add('hidden');
-        document.getElementById('logo-placeholder').classList.remove('hidden');
-        document.getElementById('logo-preview').src = '';
-        document.getElementById('logo-input').value = '';
+        // Réinitialiser le logo si présent
+        const logoPreview = document.getElementById('logo-preview');
+        const logoPlaceholder = document.getElementById('logo-placeholder');
+        const logoInput = document.getElementById('logo-input');
+        
+        if (logoPreview) {
+            logoPreview.classList.add('hidden');
+            logoPreview.src = '';
+        }
+        if (logoPlaceholder) {
+            logoPlaceholder.classList.remove('hidden');
+        }
+        if (logoInput) {
+            logoInput.value = '';
+        }
         
         // Recalculer les totaux
         calculate();
         
-        // Message de confirmation
         console.log('Nouvelle facture créée !');
     }
 }
@@ -608,6 +643,22 @@ async function downloadPDF() {
     dateInput.setAttribute('readonly', 'true');
     refInput.style.border = 'none';
     dateInput.style.border = 'none';
+    
+    // CACHER TOUS LES ÉLÉMENTS .no-print AVANT LA GÉNÉRATION DU PDF
+    document.querySelectorAll('.no-print').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Cacher les champs client vides pour éviter l'affichage des placeholders
+    const clientFields = ['client-address', 'client-city-country', 'client-phone', 'client-other'];
+    const hiddenFields = [];
+    clientFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && !field.value.trim()) {
+            field.style.display = 'none';
+            hiddenFields.push(fieldId);
+        }
+    });
     
     const element = document.getElementById('invoice-document');
     
@@ -664,6 +715,17 @@ async function downloadPDF() {
         console.error('Erreur lors de la génération du PDF:', error);
         alert('Une erreur est survenue lors de la génération du PDF');
     }
+    
+    // RÉAFFICHER TOUS LES ÉLÉMENTS .no-print APRÈS LA GÉNÉRATION
+    document.querySelectorAll('.no-print').forEach(el => {
+        el.style.display = '';
+    });
+    
+    // Réafficher les champs client qui étaient cachés
+    hiddenFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) field.style.display = '';
+    });
     
     // Restaurer les valeurs originales après génération
     setTimeout(() => {

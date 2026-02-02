@@ -83,15 +83,12 @@
         <!-- En-tête -->
         <div class="flex justify-between items-start mb-6 pb-4 border-b-2 border-indigo-100">
             <div class="flex-1">
-                <div class="relative w-32 h-32 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center overflow-hidden group cursor-pointer">
-                    <input type="file" id="logo-input" accept="image/*" onchange="handleLogo(this)" class="hidden">
-                    <label for="logo-input" class="cursor-pointer w-full h-full flex items-center justify-center">
-                        <div id="logo-placeholder" class="text-center">
-                            <i data-lucide="image-plus" class="w-12 h-12 mx-auto text-slate-300 mb-2"></i>
-                            <p class="text-xs text-slate-400 font-semibold">Ajouter logo</p>
-                        </div>
-                        <img id="logo-preview" class="hidden w-full h-full object-contain" alt="Logo">
-                    </label>
+                <div class="relative w-64 h-40 flex items-center justify-center overflow-hidden">
+                    <img src="logo.png" 
+                         alt="RANYFRESH Logo" 
+                         class="w-full h-full object-contain" 
+                         id="company-logo"
+                         style="max-width: 100%; height: auto;">
                 </div>
             </div>
             
@@ -115,16 +112,20 @@
             <div>
                 <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">De</h3>
                 <div class="bg-slate-50 rounded-xl p-3 space-y-1">
-                    <input type="text" id="company-name" placeholder="Nom de votre entreprise" class="w-full font-bold text-lg mb-1 bg-transparent">
-                    <textarea id="company-address" placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
+                    <div class="w-full font-bold text-lg mb-1">RANYFRESH</div>
+                    <div class="w-full text-sm text-slate-600">FELIX CANCEDO, 3/A - 29010 Malaga</div>
+                    <div class="w-full text-sm text-slate-600 font-semibold">Mail : rayaneno@hotmail.fr</div>
                 </div>
             </div>
             
             <div>
                 <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">À</h3>
-                <div class="bg-indigo-50 rounded-xl p-3 space-y-1">
-                    <input type="text" id="client-name" placeholder="Nom du client" class="w-full font-bold text-lg mb-1 bg-transparent">
-                    <textarea id="client-address" placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone&#10;Email" rows="2" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
+                <div class="bg-indigo-50 rounded-xl p-3 space-y-2">
+                    <input type="text" id="client-name" placeholder="Nom du client" class="w-full font-bold text-lg bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
+                    <input type="text" id="client-address" placeholder="Adresse" class="w-full text-sm text-slate-600 bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
+                    <input type="text" id="client-city-country" placeholder="Ville, Pays" class="w-full text-sm text-slate-600 bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
+                    <input type="text" id="client-phone" placeholder="Téléphone" class="w-full text-sm text-slate-600 bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
+                    
                 </div>
             </div>
         </div>
@@ -150,33 +151,40 @@
             </button>
         </div>
 
-        <!-- Totaux -->
-        <div class="flex justify-end">
-            <div class="w-80 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 space-y-2">
-                <div class="flex justify-between items-center text-sm">
-                    <span class="font-semibold text-slate-600">Sous-total HT</span>
-                    <span id="subtotal" class="font-bold text-slate-700">0.00 MAD</span>
+        <!-- Totaux et Notes côte à côte -->
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <!-- Notes / Conditions à gauche -->
+            <div>
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">Notes / Conditions</h3>
+                <div class="w-full text-sm text-slate-600 border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    <p class="font-semibold mb-2">Informations bancaires :</p>
+                    <p class="font-mono text-xs">AgroBank</p>
+                    <p class="font-mono text-xs font-bold">ES58 2100 4101 1522 0059 5320</p>
                 </div>
-                <div class="flex justify-between items-center text-sm">
-                    <span id="tva-label" class="font-semibold text-slate-600">TVA (20%)</span>
-                    <span id="tva-val" class="font-bold text-slate-700">0.00 MAD</span>
-                </div>
-                <div class="border-t-2 border-indigo-200 pt-3 flex justify-between items-center">
-                    <span class="font-black text-lg text-indigo-600">TOTAL TTC</span>
-                    <span id="total-ttc" class="font-black text-2xl text-indigo-600">0.00 MAD</span>
+            </div>
+            
+            <!-- Totaux à droite -->
+            <div class="flex flex-col justify-end">
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 space-y-2 border border-indigo-100">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="font-semibold text-slate-600">Sous-total HT</span>
+                        <span id="subtotal" class="font-bold text-slate-700">0.00 MAD</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span id="tva-label" class="font-semibold text-slate-600">TVA (20%)</span>
+                        <span id="tva-val" class="font-bold text-slate-700">0.00 MAD</span>
+                    </div>
+                    <div class="border-t-2 border-indigo-200 pt-3 flex justify-between items-center">
+                        <span class="font-black text-lg text-indigo-600">TOTAL TTC</span>
+                        <span id="total-ttc" class="font-black text-2xl text-indigo-600">0.00 MAD</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Notes -->
-        <div class="mt-6 pt-4 border-t border-slate-200">
-            <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Notes / Conditions</h3>
-            <textarea placeholder="Merci pour votre confiance..." rows="2" class="w-full text-sm text-slate-600 border border-slate-200 rounded-lg p-2 resize-none"></textarea>
-        </div>
-
         <!-- Pied de page -->
-        <div class="mt-4 text-center text-xs text-slate-400">
-            <p class="font-semibold">Merci pour votre confiance !</p>
+        <div class="mt-4 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
+            <p class="font-semibold">RANYFRESH - FELIX CANCEDO 3/A  29010 - Mail : rayaneno@hotmail.fr  </p>
         </div>
         </div> <!-- Fin invoice-document -->
     </div> <!-- Fin facture-section -->

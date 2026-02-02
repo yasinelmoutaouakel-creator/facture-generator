@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Inter', sans-serif;
 }
@@ -30,10 +34,300 @@ textarea {
     color: #334155;
 }
 
+/* Style pour les nouveaux champs client séparés */
+#client-name,
+#client-address,
+#client-city-country,
+#client-phone,
+#client-other {
+    transition: all 0.2s ease;
+}
+
+#client-name:hover,
+#client-address:hover,
+#client-city-country:hover,
+#client-phone:hover,
+#client-other:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Limiter aussi l'affichage du nom du client */
+#client-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
 /* Style pour garantir une seule page PDF */
 #invoice-document {
     max-height: fit-content;
 }
+
+/* ===== RESPONSIVE MOBILE ===== */
+
+/* Mobile - Smartphones (jusqu'à 640px) */
+@media (max-width: 640px) {
+    body {
+        padding: 0.5rem !important;
+        font-size: 14px;
+    }
+    
+    /* Réduire les marges générales */
+    .max-w-5xl, .max-w-6xl {
+        padding: 0.75rem !important;
+    }
+    
+    /* En-tête mobile */
+    .mb-6 {
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Contrôles principaux */
+    #facture-controls .flex {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+    
+    #facture-controls .flex > div {
+        width: 100% !important;
+    }
+    
+    #facture-controls button {
+        width: 100% !important;
+        padding: 0.75rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    #facture-controls select, 
+    #facture-controls input {
+        width: 100% !important;
+        font-size: 0.875rem !important;
+    }
+    
+    /* Logo responsive */
+    #company-logo {
+        max-width: 120px !important;
+        height: auto !important;
+    }
+    
+    .w-48 {
+        width: 120px !important;
+    }
+    
+    .h-32 {
+        height: 80px !important;
+    }
+    
+    /* Titre facture mobile */
+    #doc-title-display {
+        font-size: 1.75rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Infos entreprise et client en colonne sur mobile */
+    .grid-cols-2 {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    /* Réduire le padding des cartes */
+    .bg-white.rounded-2xl {
+        padding: 1rem !important;
+    }
+    
+    .p-8 {
+        padding: 1rem !important;
+    }
+    
+    .p-6 {
+        padding: 0.75rem !important;
+    }
+    
+    .p-4 {
+        padding: 0.5rem !important;
+    }
+    
+    .p-3 {
+        padding: 0.5rem !important;
+    }
+    
+    /* Tableau responsive */
+    table {
+        font-size: 0.75rem !important;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    thead, tbody, tr {
+        display: block;
+    }
+    
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    tr {
+        border: 1px solid #e2e8f0;
+        margin-bottom: 0.5rem;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        background: white;
+    }
+    
+    td {
+        display: block;
+        text-align: left !important;
+        padding: 0.5rem 0.25rem !important;
+        position: relative;
+        padding-left: 45% !important;
+        border: none !important;
+    }
+    
+    td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0.5rem;
+        font-weight: 700;
+        color: #4f46e5;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+    }
+    
+    /* Inputs dans le tableau mobile */
+    #items-body input {
+        width: 100% !important;
+        font-size: 0.875rem !important;
+        padding: 0.25rem !important;
+    }
+    
+    /* Bouton ajouter ligne */
+    button[onclick="addItem()"] {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 0.75rem !important;
+    }
+    
+    /* Section totaux mobile */
+    .grid.grid-cols-2.gap-6 {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    #total-ttc {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Boutons d'action mobile */
+    .flex.gap-3 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .flex.gap-3 button,
+    .flex.gap-3 select,
+    .flex.gap-3 input {
+        width: 100% !important;
+    }
+    
+    /* Modal mobile */
+    #client-modal > div {
+        max-width: 95% !important;
+        margin: 1rem !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    #client-modal .grid-cols-2 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Onglets mobile */
+    .flex.items-center.gap-2 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .flex.items-center.gap-2 button {
+        width: 100% !important;
+    }
+    
+    /* Filtres clients mobile */
+    .grid-cols-4 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Tableau clients mobile */
+    #clients-table-body tr {
+        display: block !important;
+        margin-bottom: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+    }
+    
+    #clients-table-body td {
+        display: block !important;
+        text-align: left !important;
+        padding: 0.25rem 0 !important;
+        border: none !important;
+    }
+    
+    #clients-table-body td:before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #4f46e5;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Tablet - iPad (641px à 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+    body {
+        padding: 1rem;
+        font-size: 15px;
+    }
+    
+    .max-w-5xl, .max-w-6xl {
+        padding: 1.5rem;
+    }
+    
+    /* Logo tablet */
+    #company-logo {
+        max-width: 150px;
+    }
+    
+    /* Tableau tablet */
+    table {
+        font-size: 0.875rem;
+    }
+    
+    /* Contrôles tablet */
+    #facture-controls .flex {
+        flex-wrap: wrap;
+    }
+    
+    #facture-controls button {
+        font-size: 0.875rem;
+        padding: 0.625rem 1.25rem;
+    }
+}
+
+/* Desktop - Ordinateur (1025px et plus) */
+@media (min-width: 1025px) {
+    /* Styles desktop normaux */
+    body {
+        padding: 1.5rem;
+    }
+}
+
+/* ===== OPTIMISATION POUR IMPRESSION PDF ===== */
 
 @media print {
     .no-print, 
@@ -54,6 +348,7 @@ textarea {
         color-adjust: exact;
         margin: 0;
         padding: 0;
+        font-size: 12pt;
     }
     
     .print-reset { 
@@ -65,6 +360,44 @@ textarea {
         padding: 15mm !important;
         page-break-after: avoid;
         page-break-inside: avoid;
+    }
+    
+    /* Remettre le tableau en mode normal pour PDF */
+    table {
+        display: table !important;
+        font-size: 10pt !important;
+    }
+    
+    thead, tbody, tr {
+        display: table-row-group !important;
+    }
+    
+    thead tr {
+        position: static !important;
+        display: table-row !important;
+    }
+    
+    tr {
+        display: table-row !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    td {
+        display: table-cell !important;
+        padding: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+    
+    td:before {
+        display: none !important;
+    }
+    
+    /* Remettre la grille normale pour PDF */
+    .grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem !important;
     }
     
     /* S'assurer que les couleurs d'arrière-plan s'impriment parfaitement */
@@ -88,6 +421,49 @@ textarea {
         background: transparent !important;
         color: #1e293b !important;
         font-weight: inherit !important;
+        overflow: hidden !important;
+    }
+    
+    /* Cacher les placeholders dans le PDF */
+    input::placeholder,
+    textarea::placeholder {
+        color: transparent !important;
+        opacity: 0 !important;
+    }
+    
+    /* Styles spécifiques pour les champs client dans le PDF */
+    #client-name {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        font-size: 11pt !important;
+    }
+    
+    #client-address,
+    #client-city-country,
+    #client-phone,
+    #client-other {
+        font-size: 9pt !important;
+        line-height: 1.4 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Cacher complètement les champs vides dans le PDF */
+    #client-address:empty,
+    #client-city-country:empty,
+    #client-phone:empty,
+    #client-other:empty {
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Cacher les lignes de bordure hover dans le PDF */
+    input:hover,
+    textarea:hover {
+        border: none !important;
+        background: transparent !important;
     }
     
     input[type="date"], input[type="text"], input[type="number"] {
@@ -106,7 +482,7 @@ textarea {
     
     /* Optimiser les tailles de police pour l'impression */
     h1 {
-        font-size: 2.5rem !important;
+        font-size: 2rem !important;
         margin-bottom: 1rem !important;
     }
     
@@ -129,36 +505,20 @@ textarea {
         page-break-inside: avoid !important;
     }
     
-    .space-y-2 > * + * {
-        margin-top: 0.25rem !important;
-    }
-    
-    .mb-10 {
-        margin-bottom: 1.5rem !important;
-    }
-    
-    .mb-8 {
-        margin-bottom: 1rem !important;
-    }
-    
-    .pb-8 {
-        padding-bottom: 1rem !important;
-    }
-    
-    .p-6 {
-        padding: 1rem !important;
-    }
-    
-    .py-4 {
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
-    }
-    
     /* Assurer que les bordures sont visibles */
     .border-b-2,
     .border-indigo-600,
     .border-slate-100 {
         border-color: inherit !important;
+    }
+    
+    /* Remettre les tailles normales */
+    .p-8 {
+        padding: 1.5rem !important;
+    }
+    
+    .mb-6 {
+        margin-bottom: 1.5rem !important;
     }
 }
 
@@ -178,4 +538,15 @@ button:active {
 
 #items-body tr:hover {
     background-color: #f8fafc;
+}
+
+/* Amélioration du scroll sur mobile */
+@media (max-width: 640px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
 }
