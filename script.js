@@ -232,18 +232,17 @@ function createInvoiceForClient(index) {
     // Passer à l'onglet facture
     switchTab('facture');
     
-    // Remplir les infos client dans les nouveaux champs séparés
-    document.getElementById('client-name').value = client.name || '';
-    document.getElementById('client-address').value = client.address || '';
+    // Remplir les infos client
+    document.getElementById('client-name').value = client.name;
+    const addressParts = [];
+    if (client.address) addressParts.push(client.address);
+    if (client.city && client.zip) addressParts.push(`${client.city}, ${client.zip}`);
+    else if (client.city) addressParts.push(client.city);
+    if (client.country) addressParts.push(client.country);
+    if (client.phone) addressParts.push(client.phone);
+    if (client.email) addressParts.push(client.email);
     
-    // Construire ville + pays
-    const cityCountryParts = [];
-    if (client.city) cityCountryParts.push(client.city);
-    if (client.country) cityCountryParts.push(client.country);
-    document.getElementById('client-city-country').value = cityCountryParts.join(', ');
-    
-    document.getElementById('client-phone').value = client.phone || '';
-    document.getElementById('client-other').value = client.email || '';
+    document.getElementById('client-address').value = addressParts.join('\n');
 }
 
 // Gérer la soumission du formulaire client
@@ -341,13 +340,9 @@ function deleteHistory(type, index) {
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     document.getElementById('doc-date').value = new Date().toISOString().split('T')[0];
-    // Auto-générer le numéro de facture
     document.getElementById('doc-ref').value = generateInvoiceNumber();
     addItem();
-    
-    // Charger la liste des clients
     loadClientsList();
-    // Charger les infos de l'entreprise si elles existent
     loadCompanyInfo();
 });
 
@@ -356,45 +351,33 @@ document.addEventListener('DOMContentLoaded', () => {
 function saveClient() {
     const clientName = document.getElementById('client-name').value.trim();
     const clientAddress = document.getElementById('client-address').value.trim();
-    const clientCityCountry = document.getElementById('client-city-country').value.trim();
-    const clientPhone = document.getElementById('client-phone').value.trim();
-    const clientOther = document.getElementById('client-other').value.trim();
     
     if (!clientName) {
         alert('Veuillez entrer le nom du client avant de sauvegarder !');
         return;
     }
     
-    // Récupérer les clients existants
     let clients = JSON.parse(localStorage.getItem('clients') || '[]');
-    
-    // Vérifier si le client existe déjà
     const existingIndex = clients.findIndex(c => c.name.toLowerCase() === clientName.toLowerCase());
     
     const client = {
         name: clientName,
         address: clientAddress,
-        cityCountry: clientCityCountry,
-        phone: clientPhone,
-        other: clientOther,
         date: new Date().toISOString()
     };
     
     if (existingIndex >= 0) {
-        // Mettre à jour le client existant
         if (confirm(`Le client "${clientName}" existe déjà. Voulez-vous le mettre à jour ?`)) {
             clients[existingIndex] = client;
             localStorage.setItem('clients', JSON.stringify(clients));
             alert('✅ Client mis à jour !');
         }
     } else {
-        // Ajouter un nouveau client
         clients.push(client);
         localStorage.setItem('clients', JSON.stringify(clients));
         alert('✅ Client sauvegardé !');
     }
     
-    // Recharger la liste
     loadClientsList();
 }
 
@@ -402,10 +385,8 @@ function loadClientsList() {
     const clients = JSON.parse(localStorage.getItem('clients') || '[]');
     const selector = document.getElementById('client-selector');
     
-    // Vider le select
     selector.innerHTML = '<option value="">-- Choisir un client --</option>';
     
-    // Ajouter les clients triés par nom
     clients.sort((a, b) => a.name.localeCompare(b.name)).forEach((client, index) => {
         const option = document.createElement('option');
         option.value = index;
@@ -416,12 +397,8 @@ function loadClientsList() {
 
 function loadClient(index) {
     if (index === '') {
-        // Vider les champs si on sélectionne "-- Choisir un client --"
         document.getElementById('client-name').value = '';
         document.getElementById('client-address').value = '';
-        document.getElementById('client-city-country').value = '';
-        document.getElementById('client-phone').value = '';
-        document.getElementById('client-other').value = '';
         return;
     }
     
@@ -429,11 +406,8 @@ function loadClient(index) {
     const client = clients[index];
     
     if (client) {
-        document.getElementById('client-name').value = client.name || '';
-        document.getElementById('client-address').value = client.address || '';
-        document.getElementById('client-city-country').value = client.cityCountry || '';
-        document.getElementById('client-phone').value = client.phone || '';
-        document.getElementById('client-other').value = client.other || '';
+        document.getElementById('client-name').value = client.name;
+        document.getElementById('client-address').value = client.address;
     }
 }
 
@@ -465,7 +439,6 @@ function loadCompanyInfo() {
     }
 }
 
-// Sauvegarder les infos entreprise automatiquement quand on les modifie
 document.addEventListener('DOMContentLoaded', () => {
     const companyName = document.getElementById('company-name');
     const companyAddress = document.getElementById('company-address');
@@ -554,33 +527,25 @@ function calculate() {
 }
 
 function newInvoice() {
-    // Confirmer avant de vider
     if (confirm('Voulez-vous créer une nouvelle facture ? Toutes les données actuelles seront perdues.')) {
-        // Vider tous les inputs du formulaire
         document.querySelectorAll('input[type="text"], textarea').forEach(input => {
             input.value = '';
         });
         
-        // Réinitialiser le sélecteur de client
         const clientSelector = document.getElementById('client-selector');
         if (clientSelector) clientSelector.value = '';
         
-        // Réinitialiser la date à aujourd'hui
         const docDate = document.getElementById('doc-date');
         if (docDate) docDate.value = new Date().toISOString().split('T')[0];
         
-        // Générer un nouveau numéro de facture
         const docRef = document.getElementById('doc-ref');
         if (docRef) docRef.value = generateInvoiceNumber();
         
-        // Supprimer toutes les lignes d'articles
         const itemsBody = document.getElementById('items-body');
         if (itemsBody) itemsBody.innerHTML = '';
         
-        // Ajouter une ligne vide
         addItem();
         
-        // Réinitialiser le logo si présent
         const logoPreview = document.getElementById('logo-preview');
         const logoPlaceholder = document.getElementById('logo-placeholder');
         const logoInput = document.getElementById('logo-input');
@@ -596,22 +561,17 @@ function newInvoice() {
             logoInput.value = '';
         }
         
-        // Recalculer les totaux
         calculate();
-        
-        console.log('Nouvelle facture créée !');
     }
 }
 
 async function downloadPDF() {
-    // Récupérer les valeurs avant la génération
     const docRef = document.getElementById('doc-ref').value || 'N/A';
     const docDate = document.getElementById('doc-date').value;
-    const docType = document.getElementById('doc-title-display').innerText; // Facture ou Devis
+    const docType = document.getElementById('doc-title-display').innerText;
     const clientName = document.getElementById('client-name').value || 'Client inconnu';
     const totalAmount = document.getElementById('total-ttc').innerText;
     
-    // Formater la date en français
     let dateFormatted = 'N/A';
     if (docDate) {
         const dateObj = new Date(docDate);
@@ -622,43 +582,34 @@ async function downloadPDF() {
         });
     }
     
-    // Créer des éléments temporaires pour afficher les valeurs dans le PDF
     const refInput = document.getElementById('doc-ref');
     const dateInput = document.getElementById('doc-date');
     
-    // Sauvegarder les valeurs originales
     const originalRefValue = refInput.value;
     const originalDateValue = dateInput.value;
     const originalRefType = refInput.type;
     const originalDateType = dateInput.type;
     
-    // Convertir les inputs en texte pour le PDF
     refInput.type = 'text';
     dateInput.type = 'text';
     refInput.value = docRef;
     dateInput.value = dateFormatted;
     
-    // Désactiver les inputs pour qu'ils ressemblent à du texte
     refInput.setAttribute('readonly', 'true');
     dateInput.setAttribute('readonly', 'true');
     refInput.style.border = 'none';
     dateInput.style.border = 'none';
     
-    // CACHER TOUS LES ÉLÉMENTS .no-print AVANT LA GÉNÉRATION DU PDF
-    document.querySelectorAll('.no-print').forEach(el => {
-        el.style.display = 'none';
-    });
+    // CONVERTIR LES RETOURS À LA LIGNE EN <br> POUR LE PDF
+    const clientAddress = document.getElementById('client-address');
+    const addressValue = clientAddress.value;
+    const addressHTML = addressValue.replace(/\n/g, '<br>');
     
-    // Cacher les champs client vides pour éviter l'affichage des placeholders
-    const clientFields = ['client-address', 'client-city-country', 'client-phone', 'client-other'];
-    const hiddenFields = [];
-    clientFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field && !field.value.trim()) {
-            field.style.display = 'none';
-            hiddenFields.push(fieldId);
-        }
-    });
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = addressHTML;
+    tempDiv.className = clientAddress.className;
+    tempDiv.style.cssText = 'font-size: 0.875rem; color: rgb(71, 85, 105); line-height: 1.5;';
+    clientAddress.parentNode.replaceChild(tempDiv, clientAddress);
     
     const element = document.getElementById('invoice-document');
     
@@ -692,7 +643,6 @@ async function downloadPDF() {
     try {
         await html2pdf().set(opt).from(element).save();
         
-        // Sauvegarder dans l'historique
         const historyKey = docType === 'Facture' ? 'historyFactures' : 'historyDevis';
         const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         history.unshift({
@@ -702,11 +652,9 @@ async function downloadPDF() {
             amount: totalAmount,
             timestamp: new Date().toISOString()
         });
-        // Garder seulement les 50 dernières
         if (history.length > 50) history.pop();
         localStorage.setItem(historyKey, JSON.stringify(history));
         
-        // Après le téléchargement réussi, générer un nouveau numéro pour la prochaine facture
         setTimeout(() => {
             document.getElementById('doc-ref').value = generateInvoiceNumber();
         }, 1000);
@@ -716,18 +664,10 @@ async function downloadPDF() {
         alert('Une erreur est survenue lors de la génération du PDF');
     }
     
-    // RÉAFFICHER TOUS LES ÉLÉMENTS .no-print APRÈS LA GÉNÉRATION
-    document.querySelectorAll('.no-print').forEach(el => {
-        el.style.display = '';
-    });
+    // REMETTRE LE TEXTAREA ORIGINAL
+    tempDiv.parentNode.replaceChild(clientAddress, tempDiv);
     
-    // Réafficher les champs client qui étaient cachés
-    hiddenFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) field.style.display = '';
-    });
-    
-    // Restaurer les valeurs originales après génération
+    // Restaurer les valeurs originales
     setTimeout(() => {
         refInput.type = originalRefType;
         dateInput.type = originalDateType;

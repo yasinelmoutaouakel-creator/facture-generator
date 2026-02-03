@@ -2,17 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Générateur de Factures</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen p-6">
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen p-2 sm:p-4 md:p-6">
     
     <!-- Contrôles en haut -->
     <div class="max-w-5xl mx-auto mb-6 no-print">
@@ -32,40 +29,37 @@
         
         <!-- Contrôles de la facture -->
         <div id="facture-controls" class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100">
-            <div class="flex items-center justify-between flex-wrap gap-4">
-                <div class="flex gap-3">
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
                     <button id="btnFacture" onclick="setDocType('Facture')" class="px-6 py-2 text-sm font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm">
                         Facture
                     </button>
                     <button id="btnDevis" onclick="setDocType('Devis')" class="px-6 py-2 text-sm font-bold rounded-lg transition text-slate-500">
                         Devis
                     </button>
-                    <label class="px-6 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition cursor-pointer flex items-center gap-2">
-                        <i data-lucide="image" class="w-4 h-4"></i>
-                        Logo
-                        <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-                    </label>
                 </div>
                 
-                <div class="flex gap-3 items-center">
-                    <select onchange="updateCurrency(this.value)" class="px-4 py-2 border border-slate-200 rounded-lg font-semibold text-sm">
+                <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full lg:w-auto">
+                    <select onchange="updateCurrency(this.value)" class="px-4 py-2 border border-slate-200 rounded-lg font-semibold text-sm w-full sm:w-auto">
                         <option value="MAD">MAD</option>
                         <option value="EUR">EUR</option>
                         <option value="USD">USD</option>
                     </select>
                     
                     <input type="number" value="20" onchange="updateTva(this.value)" 
-                           class="w-24 px-4 py-2 border border-slate-200 rounded-lg font-semibold text-sm" 
+                           class="w-full sm:w-24 px-4 py-2 border border-slate-200 rounded-lg font-semibold text-sm" 
                            placeholder="TVA %">
                     
-                    <button onclick="newInvoice()" class="px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                    <button onclick="newInvoice()" class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
                         <i data-lucide="file-plus" class="w-4 h-4"></i>
-                        Nouvelle facture
+                        <span class="hidden sm:inline">Nouvelle facture</span>
+                        <span class="sm:hidden">Nouvelle</span>
                     </button>
                     
-                    <button onclick="downloadPDF()" class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition flex items-center gap-2">
+                    <button onclick="downloadPDF()" class="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2">
                         <i data-lucide="download" class="w-4 h-4"></i>
-                        Télécharger PDF
+                        <span class="hidden sm:inline">Télécharger PDF</span>
+                        <span class="sm:hidden">PDF</span>
                     </button>
                 </div>
             </div>
@@ -73,7 +67,7 @@
     </div>
 
     <!-- Document principal -->
-    <div id="facture-section" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl p-8 print-reset">
+    <div id="facture-section" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 print-reset">
         
         <!-- Contrôles Client (hors PDF) -->
         <div class="flex justify-end gap-2 mb-4 no-print">
@@ -89,40 +83,35 @@
         <div id="invoice-document">
         
         <!-- En-tête -->
-        <div class="flex justify-between items-start mb-6 pb-4 border-b-2 border-indigo-100">
-            <div class="flex-1">
-                <div class="relative w-48 h-32 flex items-center justify-center overflow-hidden bg-slate-50 rounded-lg">
-                    <img src="logo.jpeg" 
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-start mb-6 pb-4 border-b-2 border-indigo-100 gap-4">
+            <div class="w-full md:w-auto md:flex-1">
+                <div class="relative w-48 h-32 flex items-center justify-start overflow-hidden mx-auto md:mx-0">
+                    <img src="logo.png" 
                          alt="RANYFRESH Logo" 
                          class="w-full h-full object-contain" 
                          id="company-logo"
-                         style="max-width: 100%; height: auto;"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div style="display:none; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; color:#94a3b8;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                        <span class="text-xs mt-2 font-semibold">LOGO</span>
-                    </div>
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'text-2xl font-black text-slate-700\'>RANYFRESH</div>'">
                 </div>
             </div>
             
-            <div class="text-right">
-                <h1 id="doc-title-display" class="text-4xl font-black text-indigo-600 mb-3">Facture</h1>
+            <div class="w-full md:w-auto text-center md:text-right">
+                <h1 id="doc-title-display" class="text-3xl md:text-4xl font-black text-indigo-600 mb-3">Facture</h1>
                 <div class="space-y-2">
-                    <div class="flex items-center justify-end gap-3">
+                    <div class="flex items-center justify-center md:justify-end gap-3">
                         <span class="text-sm font-semibold text-slate-500">N°:</span>
-                        <input type="text" id="doc-ref" placeholder="2025-001" class="text-right text-lg font-bold text-slate-700 border-b-2 border-slate-200 focus:border-indigo-400 outline-none px-2 py-1 w-40">
+                        <input type="text" id="doc-ref" placeholder="2025-001" class="text-center md:text-right text-lg font-bold text-slate-700 border-b-2 border-slate-200 focus:border-indigo-400 outline-none px-2 py-1 w-40">
                     </div>
-                    <div class="flex items-center justify-end gap-3">
+                    <div class="flex items-center justify-center md:justify-end gap-3">
                         <span class="text-sm font-semibold text-slate-500">Date:</span>
-                        <input type="date" id="doc-date" class="text-right text-lg font-bold text-slate-700 border-b-2 border-slate-200 focus:border-indigo-400 outline-none px-2 py-1">
+                        <input type="date" id="doc-date" class="text-center md:text-right text-lg font-bold text-slate-700 border-b-2 border-slate-200 focus:border-indigo-400 outline-none px-2 py-1">
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Infos Entreprise et Client -->
-        <div class="grid grid-cols-2 gap-6 mb-6">
-            <div class="company-info-section">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
                 <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">De</h3>
                 <div class="bg-slate-50 rounded-xl p-3 space-y-1">
                     <div class="w-full font-bold text-lg mb-1">RANYFRESH</div>
@@ -133,19 +122,16 @@
             
             <div>
                 <h3 class="text-xs font-black text-indigo-600 uppercase tracking-wider mb-3">À</h3>
-                <div class="bg-indigo-50 rounded-xl p-3 space-y-2">
-                    <input type="text" id="client-name" placeholder="Nom du client" class="w-full font-bold text-lg bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
-                    <input type="text" id="client-address" placeholder="Adresse" class="w-full text-sm text-slate-600 bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
-                    <input type="text" id="client-city-country" placeholder="Ville, Pays" class="w-full text-sm text-slate-600 bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
-                    <input type="text" id="client-phone" placeholder="Téléphone" class="w-full text-sm text-slate-600 bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
-                    <input type="text" id="client-other" placeholder="Email ou autre info" class="w-full text-sm text-slate-600 bg-transparent border-b border-transparent hover:border-indigo-200 focus:border-indigo-400 px-2 py-1 -mx-2">
+                <div class="bg-indigo-50 rounded-xl p-3 space-y-1">
+                    <input type="text" id="client-name" placeholder="Nom du client" class="w-full font-bold text-lg mb-1 bg-transparent">
+                    <textarea id="client-address" placeholder="Adresse&#10;Ville, Code postal&#10;Téléphone&#10;Email" rows="3" class="w-full text-sm text-slate-600 bg-transparent resize-none"></textarea>
                 </div>
             </div>
         </div>
 
         <!-- Tableau des articles -->
-        <div class="mb-6">
-            <table class="w-full">
+        <div class="mb-6 overflow-x-auto">
+            <table class="w-full min-w-full">
                 <thead>
                     <tr class="border-b-2 border-indigo-600">
                         <th class="text-left py-2 px-2 text-xs font-black text-indigo-600 uppercase tracking-wider">Description</th>
@@ -165,7 +151,7 @@
         </div>
 
         <!-- Totaux et Notes côte à côte -->
-        <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <!-- Notes / Conditions à gauche -->
             <div>
                 <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">Notes / Conditions</h3>
@@ -197,7 +183,7 @@
 
         <!-- Pied de page -->
         <div class="mt-4 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
-            <p class="font-semibold">Merci pour votre confiance !</p>
+            <p class="font-semibold"> --- RANYFRESH - FELIX CANCEDO 3/A 29010 Malaga --- rayaneno@hotmail.fr</p>
         </div>
         </div> <!-- Fin invoice-document -->
     </div> <!-- Fin facture-section -->
@@ -355,7 +341,7 @@
 
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Adresse</label>
-                    <textarea id="modal-client-address" rows="2" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none resize-none"></textarea>
+                    <textarea id="modal-client-address" rows="3" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg font-semibold text-sm focus:border-indigo-400 outline-none resize-none"></textarea>
                 </div>
 
                 <div class="flex gap-3 pt-4">
